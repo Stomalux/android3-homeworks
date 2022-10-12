@@ -21,19 +21,6 @@ class PostRepositoryImpl : PostRepository {
         private const val BASE_URL = "http://10.0.2.2:9999"
         private val jsonType = "application/json".toMediaType()
     }
-//было
-//    override fun getAll(): List<Post> {
-//        val request: Request = Request.Builder()
-//            .url("${BASE_URL}/api/slow/posts")
-//            .build()
-//
-//        return client.newCall(request)
-//            .execute()
-//            .let { it.body?.string() ?: throw RuntimeException("body is null") }
-//            .let {
-//                gson.fromJson(it, typeToken.type)
-//            }
-//    }
 
     override fun getAllAsync(callback: PostRepository.Callback<List<Post>>) {
         val request: Request = Request.Builder()
@@ -65,14 +52,9 @@ class PostRepositoryImpl : PostRepository {
                 .url("${BASE_URL}/api/posts/$id/likes")
                 .build()
 
-//            client.newCall(request)
-//                .execute()
-//                .close()
-//
             client.newCall(request)
                 .enqueue(object : Callback {
                     override fun onResponse(call: Call, response: Response) {
-//                        val body = response.body?.string() ?: throw RuntimeException("body is null")
                         try {
                             callback.onSuccess(post)
                         } catch (e: Exception) {
@@ -85,28 +67,15 @@ class PostRepositoryImpl : PostRepository {
                     }
                 })
 
-
-
-
         } else {
             val request: Request = Request.Builder()
                 .post("".toRequestBody())
                 .url("${BASE_URL}/api/posts/$id/likes")
                 .build()
 
-//            client.newCall(request)
-//                .execute()
-//                .close()
-
             client.newCall(request)
                 .enqueue(object : Callback {
                     override fun onResponse(call: Call, response: Response) {
-//                        val body = response.body?.string() ?: throw RuntimeException("body is null")
-//                        try {
-//                            callback.onSuccess(gson.fromJson(body, typeToken.type))
-//                        } catch (e: Exception) {
-//                            callback.onError(e)
-//                        }
                     }
 
                     override fun onFailure(call: Call, e: IOException) {
@@ -115,7 +84,6 @@ class PostRepositoryImpl : PostRepository {
                 })
         }
     }
-    // println("2222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222")
 
     override fun save(post: Post, callback: PostRepository.Callback<Post>) {
         println("Вод в репозиторий импл")
@@ -124,21 +92,16 @@ class PostRepositoryImpl : PostRepository {
             .url("${BASE_URL}/api/slow/posts")
             .build()
 
-//        client.newCall(request)
-//            .execute()
-//            .close()
         println("Создан запрос")
         client.newCall(request)
             .enqueue(object : Callback {
                 override fun onResponse(call: Call, response: Response) {
                     println(" override fun onResponse(call: Call, response: Response)")
-//                        val body = response.body?.string() ?: throw RuntimeException("body is null")
-                       try {
-
-                            callback.onSuccess(post)
-                       } catch (e: Exception) {
-                            callback.onError(e)
-                       }
+                   try {
+                        callback.onSuccess(post)
+                    } catch (e: Exception) {
+                        callback.onError(e)
+                    }
                 }
 
                 override fun onFailure(call: Call, e: IOException) {
@@ -154,24 +117,20 @@ class PostRepositoryImpl : PostRepository {
             .url("${BASE_URL}/api/slow/posts/$id")
             .build()
 
-//        client.newCall(request)
-//            .execute()
-//            .close()
-
         client.newCall(request)
             .enqueue(object : Callback {
                 override fun onResponse(call: Call, response: Response) {
                     println(" override fun onResponse(call: Call, response: Response)")
 //                        val body = response.body?.string() ?: throw RuntimeException("body is null")
                     try {
-                       val post1= Post(
-                           id = 0,
-                           content = "",
-                           author = "",
-                           likedByMe = false,
-                           likes = 0,
-                           published = ""
-                       )
+                        val post1 = Post(
+                            id = 0,
+                            content = "",
+                            author = "",
+                            likedByMe = false,
+                            likes = 0,
+                            published = ""
+                        )
                         callback.onSuccess(post1)
                     } catch (e: Exception) {
                         callback.onError(e)
