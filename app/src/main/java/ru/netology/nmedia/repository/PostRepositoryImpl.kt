@@ -121,7 +121,7 @@ class PostRepositoryImpl : PostRepository {
             .enqueue(object : Callback {
                 override fun onResponse(call: Call, response: Response) {
                     println(" override fun onResponse(call: Call, response: Response)")
-//                        val body = response.body?.string() ?: throw RuntimeException("body is null")
+
                     try {
                         val post1 = Post(
                             id = 0,
