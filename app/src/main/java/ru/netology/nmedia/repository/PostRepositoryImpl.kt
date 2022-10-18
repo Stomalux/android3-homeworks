@@ -7,6 +7,9 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import ru.netology.nmedia.dto.Post
 import java.io.IOException
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.nio.file.StandardCopyOption
 import java.util.concurrent.TimeUnit
 
 
@@ -22,6 +25,60 @@ class PostRepositoryImpl : PostRepository {
         private val jsonType = "application/json".toMediaType()
     }
 
+//    override fun getAllAsync(callback: PostRepository.Callback<List<Post>>) {
+//        val request: Request = Request.Builder()
+//            .url("${BASE_URL}/api/slow/posts")
+//            .build()
+//
+//        client.newCall(request)
+//            .enqueue(object : Callback {
+//
+//                override fun onResponse(call: Call, response: Response) {
+//
+//                    val body = response.body?.string() ?: throw RuntimeException("body is null")
+//                    val posts: List<Post> =gson.fromJson(body, typeToken.type)
+//
+//
+//                    val avatarsLoadTasks = posts.asSequence()
+//                        .map { it.authorAvatar }
+//                        .onEach { println(it) }
+//                        .distinct()
+//                        .map { it to Request.Builder().url("$BASE_URL/avatars/$it").build() }
+//                        .map { (url, request) ->
+//                 //           Callable {
+//                                println("executed in ${Thread.currentThread().name}")
+//                                client.newCall(request)
+//                                    .execute()
+//                                    .body?.use {
+//                                        Files.copy(it.byteStream(), Paths.get(url), StandardCopyOption.REPLACE_EXISTING)
+//                                        url
+//                               //     }
+//                            }
+//                        }.toMutableList()
+//
+//
+//                    try {
+//
+//
+//
+//                        callback.onSuccess(gson.fromJson(body, typeToken.type))
+//                    } catch (e: Exception) {
+//                        callback.onError(e)
+//                    }
+//                }
+//
+//                override fun onFailure(call: Call, e: IOException) {
+//                    callback.onError(e)
+//                }
+//            })
+//
+//
+//
+//
+//    }
+
+
+
     override fun getAllAsync(callback: PostRepository.Callback<List<Post>>) {
         val request: Request = Request.Builder()
             .url("${BASE_URL}/api/slow/posts")
@@ -32,6 +89,9 @@ class PostRepositoryImpl : PostRepository {
                 override fun onResponse(call: Call, response: Response) {
                     val body = response.body?.string() ?: throw RuntimeException("body is null")
                     try {
+
+
+
                         callback.onSuccess(gson.fromJson(body, typeToken.type))
                     } catch (e: Exception) {
                         callback.onError(e)
@@ -42,7 +102,16 @@ class PostRepositoryImpl : PostRepository {
                     callback.onError(e)
                 }
             })
+
+
+
+
     }
+
+
+
+
+
 
     override fun likeByIdAsync(post: Post, callback: PostRepository.Callback<Post>) {
         val id = post.id
@@ -125,8 +194,9 @@ class PostRepositoryImpl : PostRepository {
                     try {
                         val post1 = Post(
                             id = 0,
-                            content = "",
                             author = "",
+                            authorAvatar= "",
+                            content = "",
                             likedByMe = false,
                             likes = 0,
                             published = ""

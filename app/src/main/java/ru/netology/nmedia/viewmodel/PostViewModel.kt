@@ -11,6 +11,7 @@ private val empty = Post(
     id = 0,
     content = "",
     author = "",
+    authorAvatar= "",
     likedByMe = false,
     likes = 0,
     published = ""
@@ -50,7 +51,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
             override fun onSuccess(posts: Post) {
                 _postCreated.postValue(Unit)
-                // loadPosts()
+
             }
 
             override fun onError(e: Exception) {
@@ -63,9 +64,8 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
     fun save() {
         edited.value?.let {
-            //     thread {
-            //  _postCreated.postValue(Unit)
-            println("do do")
+
+   //         println("do do")
             repository.save(post = it, object : PostRepository.Callback<Post> {
 
                 override fun onSuccess(posts: Post) {
