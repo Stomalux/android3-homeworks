@@ -37,11 +37,11 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         repository.getAllAsync(object : PostRepository.Callback<List<Post>> {
 
             override fun onSuccess(posts: List<Post>) {
-                _data.postValue(FeedModel(posts = posts, empty = posts.isEmpty()))
+                _data.value = (FeedModel(posts = posts, empty = posts.isEmpty()))
             }
 
             override fun onError(e: Exception) {
-                _data.postValue(FeedModel(error = true))
+                _data.value = (FeedModel(error = true))
             }
         })
     }
@@ -55,7 +55,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
             }
 
             override fun onError(e: Exception) {
-                _data.postValue(FeedModel(error = true))
+                _data.value = (FeedModel(error = true))
             }
 
         })
@@ -73,7 +73,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
                 }
 
                 override fun onError(e: Exception) {
-                    _data.postValue(FeedModel(error = true))
+                    _data.value = (FeedModel(error = true))
                 }
             })
         }
@@ -86,14 +86,14 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
                 .filter { it.id != id }
             )
         )
-        repository.removeById(id, object : PostRepository.Callback<Post> {
+        repository.removeById(id, object : PostRepository.Callback<Unit> {
 
-            override fun onSuccess(posts: Post) {
+            override fun onSuccess(posts: Unit) {
                 loadPosts()
             }
 
             override fun onError(e: Exception) {
-                _data.postValue(FeedModel(error = true))
+                _data.value = (FeedModel(error = true))
             }
         })
     }
