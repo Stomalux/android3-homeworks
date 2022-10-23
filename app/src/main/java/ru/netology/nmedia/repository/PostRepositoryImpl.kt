@@ -19,8 +19,6 @@ import retrofit2.Response
 import ru.netology.nmedia.api.PostApiServiceHolder
 
 
-
-
 class PostRepositoryImpl : PostRepository {
 
     override fun getAllAsync(callback: PostRepository.Callback<List<Post>>) {
@@ -47,13 +45,10 @@ class PostRepositoryImpl : PostRepository {
     }
 
 
+    override fun save(post: Post, callback: PostRepository.Callback<Post>) {
 
-
-
-        override fun save(post: Post, callback: PostRepository.Callback<Post>) {
-
-            PostApiServiceHolder.service.save(post)
-                .enqueue(object : Callback<Post> {
+        PostApiServiceHolder.service.save(post)
+            .enqueue(object : Callback<Post> {
 
                 override fun onResponse(call: Call<Post>, response: Response<Post>) {
                     if (!response.isSuccessful) {
@@ -66,16 +61,20 @@ class PostRepositoryImpl : PostRepository {
                     }
                     callback.onSuccess(body)
                 }
+
                 override fun onFailure(call: Call<Post>, t: Throwable) {
                     callback.onError(RuntimeException(t))
                 }
             })
-        }
+    }
 
-        override fun removeById(id: Long, callback:PostRepository.Callback<Unit> ){     //PostRepository.Callback<Unit>) {
+    override fun removeById(
+        id: Long,
+        callback: PostRepository.Callback<Unit>
+    ) {     //PostRepository.Callback<Unit>) {
 
-            PostApiServiceHolder.service.removeById(id)
-                .enqueue(object : Callback<Unit> {
+        PostApiServiceHolder.service.removeById(id)
+            .enqueue(object : Callback<Unit> {
 
                 override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                     if (!response.isSuccessful) {
@@ -91,12 +90,12 @@ class PostRepositoryImpl : PostRepository {
                         return
                     })
                 }
+
                 override fun onFailure(call: Call<Unit>, t: Throwable) {
                     callback.onError(RuntimeException(t))
                 }
             })
-        }
-
+    }
 
 
     override fun likeByIdAsync(post: Post, callback: PostRepository.Callback<Post>) {
@@ -122,7 +121,7 @@ class PostRepositoryImpl : PostRepository {
                         callback.onError(RuntimeException(t))
                     }
                 })
-        }else {
+        } else {
             PostApiServiceHolder.service.DelitLikeByIdAsync(id)
                 .enqueue(object : Callback<Post> {
                     override fun onResponse(call: Call<Post>, response: Response<Post>) {
@@ -145,36 +144,7 @@ class PostRepositoryImpl : PostRepository {
         }
     }
 
-
-
-
-
-
-
-
-
-
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+}
 
 
 //    override fun likeByIdAsync(post: Post, callback: PostRepository.Callback<Post>) {

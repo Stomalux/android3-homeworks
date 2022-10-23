@@ -51,7 +51,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
             override fun onSuccess(posts: Post) {
                 _postCreated.postValue(Unit)
-
+               loadPosts()
             }
 
             override fun onError(e: Exception) {
