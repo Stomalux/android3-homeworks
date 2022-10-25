@@ -14,7 +14,7 @@ interface PostRepository {
 
     suspend fun likeByIdAsync(post: Post)
 
-    suspend  fun getAllAsync(): List<Post>
+    suspend  fun getAllAsync()
 //
 //    interface Callback<T> {
 //        fun onSuccess(posts : T) {}
