@@ -5,6 +5,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy.REPLACE
 import androidx.room.Query
+import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.entity.PostEntity
 
 
@@ -35,4 +36,9 @@ interface PostDao {
 
     @Query("DELETE FROM PostEntity WHERE id = :id")
     suspend fun removeById(id: Long)
+
+
+    fun List<PostEntity>.toDto(): List<Post> = map(PostEntity::toDto)
+    fun List<Post>.toEntity(): List<PostEntity> = map(PostEntity::fromDto)
+
 }
