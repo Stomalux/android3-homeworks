@@ -26,19 +26,22 @@ private val retrofit = Retrofit.Builder()
 interface PostApiService {
 
     @GET("posts")
-    fun getAllAsync(): Call<List<Post>>
+    suspend  fun getAllAsync(): List<Post>
+
+    @GET("posts/{id}")
+    suspend  fun getBiId(@Path("id") id: Long): Post
 
     @POST("posts")
-    fun save(@Body post: Post): Call<Post>
+    suspend fun save(@Body post: Post): Post
 
     @POST("posts/{id}/likes")
-    fun likeByIdAsync(@Path("id") id: Long): Call<Post>
+    suspend fun likeByIdAsync(@Path("id") id: Long): Post
 
     @DELETE("posts/{id}/likes")
-    fun DelitLikeByIdAsync(@Path("id") id: Long): Call<Post>
+    suspend fun delitLikeByIdAsync(@Path("id") id: Long): Post
 
     @DELETE("posts/{id}")
-    fun removeById(@Path("id") id: Long): Call<Unit>
+    suspend fun removeById(@Path("id") id: Long)
 }
 object PostApiServiceHolder {
     val service: PostApiService by lazy {

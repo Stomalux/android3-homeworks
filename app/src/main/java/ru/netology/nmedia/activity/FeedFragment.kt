@@ -9,11 +9,13 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.snackbar.Snackbar
 import ru.netology.nmedia.R
 import ru.netology.nmedia.adapter.OnInteractionListener
 import ru.netology.nmedia.adapter.PostsAdapter
 import ru.netology.nmedia.databinding.FragmentFeedBinding
 import ru.netology.nmedia.dto.Post
+import ru.netology.nmedia.model.FeedModelState
 import ru.netology.nmedia.viewmodel.PostViewModel
 
 class FeedFragment : Fragment() {
@@ -54,15 +56,33 @@ class FeedFragment : Fragment() {
             }
         })
         binding.list.adapter = adapter
-        viewModel.data.observe(viewLifecycleOwner, { state ->
+        viewModel.data.observe(viewLifecycleOwner) { state ->
             adapter.submitList(state.posts)
-            binding.progress.isVisible = state.loading
-            binding.errorGroup.isVisible = state.error
+          //  binding.progress.isVisible = state.loading
+         //   binding.errorGroup.isVisible = state.error
             binding.emptyText.isVisible = state.empty
-        })
+        }
+
+        viewModel.state.observe(viewLifecycleOwner) { state ->
+            binding.progress.isVisible = state is FeedModelState.Loading
+            if (state is FeedModelState.Error) {
+                Snackbar.make(binding.root, R.string.error_loading, Snackbar.LENGTH_LONG)
+                    .setAction(R.string.retry_loading) {
+                    viewModel.refresh()
+                }
+                    .show()
+            }
+            binding.errorGroup.isVisible = state is FeedModelState.Error
+            binding.swipeRefresh.isRefreshing = state is FeedModelState.Refreshing
+           }
+
 
         binding.retryButton.setOnClickListener {
             viewModel.loadPosts()
+        }
+
+        binding.swipeRefresh.setOnRefreshListener {
+            viewModel.refresh()
         }
 
         binding.fab.setOnClickListener {

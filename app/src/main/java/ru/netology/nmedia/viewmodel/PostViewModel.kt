@@ -2,8 +2,11 @@ package ru.netology.nmedia.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.*
+import kotlinx.coroutines.launch
+import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.model.FeedModel
+import ru.netology.nmedia.model.FeedModelState
 import ru.netology.nmedia.repository.*
 import ru.netology.nmedia.util.SingleLiveEvent
 
@@ -11,7 +14,7 @@ private val empty = Post(
     id = 0,
     content = "",
     author = "",
-    authorAvatar= "",
+    authorAvatar = "",
     likedByMe = false,
     likes = 0,
     published = ""
@@ -19,10 +22,19 @@ private val empty = Post(
 
 class PostViewModel(application: Application) : AndroidViewModel(application) {
     // упрощённый вариант
-    private val repository: PostRepository = PostRepositoryImpl()
-    private val _data = MutableLiveData(FeedModel())
-    val data: LiveData<FeedModel>
-        get() = _data
+    private val repository: PostRepository = PostRepositoryImpl(
+        AppDb.getInstance(application).postDao()
+    )
+
+    // private val _data = MutableLiveData(FeedModel())
+    val data: LiveData<FeedModel> = repository.data.map { FeedModel(it, it.isEmpty()) }
+    //  get() = _data
+
+    private val _state = MutableLiveData<FeedModelState>(FeedModelState.Idle)
+    val state: LiveData<FeedModelState>
+        get() = _state
+
+
     val edited = MutableLiveData(empty)
     private val _postCreated = SingleLiveEvent<Unit>()
     val postCreated: LiveData<Unit>
@@ -33,69 +45,55 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun loadPosts() {
-        _data.value = FeedModel(loading = true)
-        repository.getAllAsync(object : PostRepository.Callback<List<Post>> {
+        viewModelScope.launch {
+            _state.value = FeedModelState.Loading
+            try {
+                repository.getAllAsync()
+                _state.value = FeedModelState.Idle
+            } catch (e: Exception) {
+                _state.value = FeedModelState.Error
 
-            override fun onSuccess(posts: List<Post>) {
-                _data.value = (FeedModel(posts = posts, empty = posts.isEmpty()))
             }
-
-            override fun onError(e: Exception) {
-                _data.value = (FeedModel(error = true))
-            }
-        })
+        }
     }
 
     fun likeById(post: Post) {
-        repository.likeByIdAsync(post, object : PostRepository.Callback<Post> {
+        viewModelScope.launch { }
 
-            override fun onSuccess(posts: Post) {
-                _postCreated.postValue(Unit)
-               loadPosts()
-            }
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // repository.likeByIdAsync(post)
 
-            override fun onError(e: Exception) {
-                _data.value = (FeedModel(error = true))
-            }
-
-        })
-
+        _postCreated.postValue(Unit)
+        loadPosts()
     }
+
 
     fun save() {
-        edited.value?.let {
+        viewModelScope.launch {
+            edited.value?.let {
 
-   //         println("do do")
-            repository.save(post = it, object : PostRepository.Callback<Post> {
-
-                override fun onSuccess(posts: Post) {
-                    _postCreated.postValue(Unit)
-                }
-
-                override fun onError(e: Exception) {
-                    _data.value = (FeedModel(error = true))
-                }
-            })
+                //         println("do do")
+                repository.save(it)
+                _postCreated.postValue(Unit)
+            }
+            edited.value = empty
         }
-        edited.value = empty
     }
 
+
     fun removeById(id: Long) {
-        _data.postValue(
-            _data.value?.copy(posts = _data.value?.posts.orEmpty()
-                .filter { it.id != id }
-            )
-        )
-        repository.removeById(id, object : PostRepository.Callback<Unit> {
-
-            override fun onSuccess(posts: Unit) {
-                loadPosts()
-            }
-
-            override fun onError(e: Exception) {
-                _data.value = (FeedModel(error = true))
-            }
-        })
+        viewModelScope.launch {
+            repository.removeById(id)
+            loadPosts()
+//            override fun onSuccess(posts: Unit) {
+//
+//            }
+//
+//            override fun onError(e: Exception) {
+//                _data.value = (FeedModel(error = true))
+//            }
+//        })
+        }
     }
 
     fun edit(post: Post) {
@@ -109,4 +107,19 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         }
         edited.value = edited.value?.copy(content = text)
     }
+
+
+    fun refresh() {
+        viewModelScope.launch {
+            _state.value = FeedModelState.Refreshing
+            try {
+                repository.getAllAsync()
+                _state.value = FeedModelState.Idle
+            } catch (e: Exception) {
+                _state.value = FeedModelState.Error
+
+            }
+        }
+    }
+
 }
