@@ -26,9 +26,8 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         AppDb.getInstance(application).postDao()
     )
 
-    // private val _data = MutableLiveData(FeedModel())
     val data: LiveData<FeedModel> = repository.data.map { FeedModel(it, it.isEmpty()) }
-    //  get() = _data
+
 
     private val _state = MutableLiveData<FeedModelState>(FeedModelState.Idle)
     val state: LiveData<FeedModelState>
@@ -44,19 +43,27 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         loadPosts()
     }
 
-    fun loadPosts() {
-        viewModelScope.launch {
-            _state.value = FeedModelState.Loading
-            try {
-                repository.getAllAsync()
-                _state.value = FeedModelState.Idle
-            } catch (e: Exception) {
-                _state.value = FeedModelState.Error
-
-            }
+//    fun loadPosts() {
+//        viewModelScope.launch {
+//            _state.value = FeedModelState.Loading
+//            try {
+//                repository.getAllAsync()
+//                _state.value = FeedModelState.Idle
+//            } catch (e: Exception) {
+//                _state.value = FeedModelState.Error
+//
+//            }
+//        }
+//    }
+    fun loadPosts() = viewModelScope.launch {
+        try {
+            _state.value =FeedModelState.Loading// FeedModelState(loading = true)
+            repository.getAllAsync()
+            _state.value = FeedModelState.Idle //FeedModelState()
+        } catch (e: Exception) {
+            _state.value = FeedModelState.Error //FeedModelState(error = true)
         }
     }
-
     fun likeById(post: Post) {
         viewModelScope.launch { }
 

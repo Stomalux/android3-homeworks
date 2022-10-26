@@ -12,6 +12,4 @@ sealed interface FeedModelState {
     object Loading : FeedModelState
     object Refreshing : FeedModelState
     object Error : FeedModelState
-
-
 }
