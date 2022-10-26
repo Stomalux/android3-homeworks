@@ -29,7 +29,13 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     val data: LiveData<FeedModel> = repository.data.map { FeedModel(it, it.isEmpty()) }
 
 
-    private val _state = MutableLiveData<FeedModelState>(FeedModelState.Idle)
+    /////////////////////////////////////////////////////////////////////////
+    private val _state = MutableLiveData<FeedModelState>()
+    //private val _state = MutableLiveData<FeedModelState>(FeedModelState.Idle)
+
+
+
+
     val state: LiveData<FeedModelState>
         get() = _state
 
@@ -55,19 +61,30 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 //            }
 //        }
 //    }
-    fun loadPosts() = viewModelScope.launch {
-        try {
-            _state.value =FeedModelState.Loading// FeedModelState(loading = true)
-            repository.getAllAsync()
-            _state.value = FeedModelState.Idle //FeedModelState()
-        } catch (e: Exception) {
-            _state.value = FeedModelState.Error //FeedModelState(error = true)
-        }
-    }
+
+ ////////////////////////////////////////////////////////////////////////////////////////////////
+ fun loadPosts() = viewModelScope.launch {
+     try {
+         _state.value = FeedModelState(loading = true)
+         repository.getAllAsync()
+         _state.value = FeedModelState()
+     } catch (e: Exception) {
+         _state.value = FeedModelState(error = true)
+     }
+ }
+
+//    fun loadPosts() = viewModelScope.launch {
+//        try {
+//            _state.value =FeedModelState.Loading// FeedModelState(loading = true)
+//            repository.getAllAsync()
+//            _state.value = FeedModelState.Idle //FeedModelState()
+//        } catch (e: Exception) {
+//            _state.value = FeedModelState.Error //FeedModelState(error = true)
+//        }
+//    }
     fun likeById(post: Post) {
         viewModelScope.launch { }
 
-        ///////////////////////////////////////////////////////////////////////////////////////////////
         // repository.likeByIdAsync(post)
 
         _postCreated.postValue(Unit)
@@ -114,19 +131,32 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         }
         edited.value = edited.value?.copy(content = text)
     }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-    fun refresh() {
-        viewModelScope.launch {
-            _state.value = FeedModelState.Refreshing
-            try {
-                repository.getAllAsync()
-                _state.value = FeedModelState.Idle
-            } catch (e: Exception) {
-                _state.value = FeedModelState.Error
-
-            }
+    fun refresh() = viewModelScope.launch {
+        try {
+            _state.value = FeedModelState(refreshing = true)
+            repository.getAllAsync()
+            _state.value = FeedModelState()
+        } catch (e: Exception) {
+            _state.value = FeedModelState(error = true)
         }
     }
+
+
+
+
+//    fun refresh() {
+//        viewModelScope.launch {
+//            _state.value = FeedModelState.Refreshing
+//            try {
+//                repository.getAllAsync()
+//                _state.value = FeedModelState.Idle
+//            } catch (e: Exception) {
+//                _state.value = FeedModelState.Error
+//
+//            }
+//        }
+//    }
 
 }

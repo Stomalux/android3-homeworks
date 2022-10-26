@@ -7,9 +7,9 @@ data class FeedModel(
     val empty: Boolean = false,
 )
 
-sealed interface FeedModelState {
-    object Idle:FeedModelState
-    object Loading : FeedModelState
-    object Refreshing : FeedModelState
-    object Error : FeedModelState
-}
+//sealed interface FeedModelState {
+//    object Idle:FeedModelState
+//    object Loading : FeedModelState
+//    object Refreshing : FeedModelState
+//    object Error : FeedModelState
+//}

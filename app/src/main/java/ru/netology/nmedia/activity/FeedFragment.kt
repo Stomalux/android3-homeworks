@@ -55,7 +55,11 @@ class FeedFragment : Fragment() {
                 startActivity(shareIntent)
             }
         })
+
+
         binding.list.adapter = adapter
+
+
         viewModel.data.observe(viewLifecycleOwner) { state ->
             adapter.submitList(state.posts)
           //  binding.progress.isVisible = state.loading
@@ -63,17 +67,27 @@ class FeedFragment : Fragment() {
             binding.emptyText.isVisible = state.empty
         }
 
+
+
+
+
+
         viewModel.state.observe(viewLifecycleOwner) { state ->
-            binding.progress.isVisible = state is FeedModelState.Loading
-            if (state is FeedModelState.Error) {
+
+            binding.progress.isVisible = state.loading
+
+            //binding.progress.isVisible = state is FeedModelState.Loading
+          //  if (state is FeedModelState.Error) {
+
+            if (state.error) {
                 Snackbar.make(binding.root, R.string.error_loading, Snackbar.LENGTH_LONG)
                     .setAction(R.string.retry_loading) {
                     viewModel.refresh()
                 }
                     .show()
             }
-            binding.errorGroup.isVisible = state is FeedModelState.Error
-            binding.swipeRefresh.isRefreshing = state is FeedModelState.Refreshing
+            binding.errorGroup.isVisible = state.error  ///state is FeedModelState.Error
+            binding.swipeRefresh.isRefreshing = state.refreshing  //state is FeedModelState.Refreshing
            }
 
 
